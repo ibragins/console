@@ -16,6 +16,7 @@ import { testName } from '@console/internal-integration-tests/protractor.conf';
 import * as wizardView from '../../views/wizard.view';
 import { ImportWizard } from './importWizard';
 import { isLoaded } from '@console/internal-integration-tests/views/crud.view';
+import { VMBuilderData } from '../types/vm';
 
 export class VmwareImportWizard extends ImportWizard {
   async fillHostname(hostname: string) {
@@ -80,9 +81,16 @@ export class VmwareImportWizard extends ImportWizard {
     });
   }
 
+  async processReviewStep(data: VMBuilderData) {
+    await this.validateReviewTab(data);
+  }
+
   async importVmConnectProviderStep(config) {
     const { provider, instanceConfig, sourceVMName } = config;
     // Establishing connection:
+    await this.selectProvider(provider);
+    await browser.sleep(10000);
+    await browser.refresh();
     await this.selectProvider(provider);
     await this.waitForSpinner();
     await this.configureInstance(instanceConfig);
@@ -126,7 +134,7 @@ export class VmwareImportWizard extends ImportWizard {
     await this.processAdvanceStep(config);
 
     // Review
-    await this.processReviewStep(config);
+    // await this.processReviewStep(config);
 
     // Import
     await this.confirmAndCreate();

@@ -32,8 +32,10 @@ const exInstanceConfig: InstanceConfig = {
   saveInstance: false,
 };
 
-export const vmName = 'v2v-rhel7-vm';
-export const vmNameSecond = 'v2v-rhel7-vm';
+// export const vmName = 'v2v-rhel7-vm';
+// export const vmNameSecond = 'v2v-rhel7-vm';
+export const vmName = 'v2v-cirros-vm-for-tests';
+export const vmNameSecond = 'v2v-cirros-vm-for-tests';
 export const RHV = 'Red Hat Virtualization (RHV)';
 
 export const rhvVMConfigStartOnCreate: VMImportConfig = {

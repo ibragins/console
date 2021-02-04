@@ -7,7 +7,8 @@ import { appHost, testName, waitForNone } from '../protractor.conf';
 import { waitForCount } from '@console/shared/src/test-utils/utils';
 
 export const createYAMLButton = $('#yaml-create');
-export const createItemButton = $('#item-create');
+export const createItemButton = $('[data-test-id="item-create"]');
+//export const createItemButton = $('#item-create');
 export const createYAMLLink = $('#yaml-link');
 
 export const saveChangesBtn = $('#save-changes');
@@ -68,10 +69,14 @@ export const filterForName = async (name: string) => {
 };
 
 const actionOnKind = (action: string, kind: string) => {
-  return `${action} ${kind}`;
+  const humanizedKind = (kind.includes('~') ? kind.split('~')[2] : kind)
+    .split(/(?=[A-Z])/)
+    .join(' ');
+
+  return `${action} ${humanizedKind}`;
 };
-export const editKind = (kind: string) => actionOnKind(actions.edit, kind);
-export const deleteKind = (kind: string) => actionOnKind(actions.delete, kind);
+export const editHumanizedKind = (kind: string) => actionOnKind(actions.edit, kind);
+export const deleteHumanizedKind = (kind: string) => actionOnKind(actions.delete, kind);
 
 export const clickCreateWithYAML = async () => {
   await browser.wait(until.elementToBeClickable(createYAMLButton));
@@ -92,7 +97,7 @@ export const clickKebabAction = async (resourceName: string, actionLabel: string
  * Edit row from a list.
  */
 export const editRow = (kind: string) => (name: string) =>
-  clickKebabAction(name, editKind(kind)).then(async () => {
+  clickKebabAction(name, editHumanizedKind(kind)).then(async () => {
     await browser.wait(until.presenceOf(cancelBtn));
     const reloadBtnIsPresent = await reloadBtn.isPresent();
     if (reloadBtnIsPresent) {
@@ -105,8 +110,8 @@ export const editRow = (kind: string) => (name: string) =>
 /**
  * Deletes a row from a list. Does not wait until the row is no longer visible.
  */
-export const deleteRow = (kind: string) => (name: string) => {
-  const label = `${actions.delete} ${kind}`;
+export const deleteRow = (kind: string, useResourceLabel: boolean = false) => (name: string) => {
+  const label = useResourceLabel ? `${actions.delete} ${kind}` : deleteHumanizedKind(kind);
   return clickKebabAction(name, label).then(async () => {
     switch (kind) {
       case 'Namespace':
@@ -161,7 +166,7 @@ export const clickDetailsPageAction = async (actionID: string) => {
 export const deleteResource = async (resource: string, kind: string, name: string) => {
   await visitResource(resource, name);
   await isLoaded();
-  clickDetailsPageAction(deleteKind(kind));
+  clickDetailsPageAction(deleteHumanizedKind(kind));
   await browser.wait(until.presenceOf($('#confirm-action')));
   await $('#confirm-action').click();
 };
